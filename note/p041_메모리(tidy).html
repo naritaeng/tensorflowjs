@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+    <script>
+      const prt = console.log;
+      const t1 = tf.tensor1d([1, 2, 3]);
+      prt(tf.memory());
+
+      const rt = tf.tidy(() => {
+        // tidy() - 특정 스코프 안의 텐서에 할당된 메모리 해제
+        return t1.log().square().round(); // round의 결과로 반환되는 텐서는 rt에서 참조한다고 가정하기때문에
+      }); // 반환된 후에도 자동 해제되지 않음
+      t1.dispose(); // 위에서 반환 값을 받았기때문에 메모리 정리
+      console.log(rt);
+      rt.dispose();
+      prt(tf.memory());
+    </script>
+  </head>
+  <body></body>
+</html>
