@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+    <script>
+      const t0 = tf.scalar(119);
+      t0.print(1);
+      const t1 = tf.tensor1d([1, 2, 3]);
+      t1.print(true);
+      // Tensor
+      // dtype : float32
+      // rank : 1
+      // shape : [3]
+      // values : [1, 2, 3]
+      //   const t2 = tf.tensor2d([1, 2, 3, 4], [2, 2]);
+      const t2 = tf.tensor2d([
+        [1, 2],
+        [3, 4],
+      ]);
+      t2.print(true);
+      // Tensor
+      // dtype : float32
+      // rank : 2
+      // shape : [2,2]
+      // values : [[1, 2],
+      //          [3, 4]]
+      const t3 = tf.tensor3d([
+        [
+          [1, 2, 3, 4],
+          [5, 6, 7, 8],
+        ],
+        [
+          [9, 10, 11, 12],
+          [13, 14, 15, 16],
+        ],
+      ]);
+      t3.print(true);
+      //   Tensor
+      //   dtype: float32
+      //   rank: 3
+      //   shape: [2,2,4]
+      //   values:
+      //     [[[1 , 2 , 3 , 4 ],
+      //       [5 , 6 , 7 , 8 ]],
+
+      //      [[9 , 10, 11, 12],
+      //       [13, 14, 15, 16]]]
+
+      const arr1 = [];
+      for (let i = 0; i < 27; i++) {
+        arr1.push(i + 1);
+      }
+      const tt3 = tf.tensor3d(arr1, [3, 3, 3]);
+      tt3.print(true);
+      //   Tensor
+      //   dtype: float32
+      //   rank: 3
+      //   shape: [3,3,3]
+      //   values:
+      //     [[[1 , 2 , 3 ],
+      //       [4 , 5 , 6 ],
+      //       [7 , 8 , 9 ]],
+
+      //      [[10, 11, 12],
+      //       [13, 14, 15],
+      //       [16, 17, 18]],
+
+      //      [[19, 20, 21],
+      //       [22, 23, 24],
+      //       [25, 26, 27]]]
+    </script>
+  </head>
+  <body></body>
+</html>
