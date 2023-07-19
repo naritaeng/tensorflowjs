@@ -14,6 +14,14 @@
       color: tomato;
       text-align: center;
     }
+    #user_btn {
+      width: 100px;
+      height: 80px;
+      border: none;
+      border-radius: 20px;
+      background: gold;
+      color: blue;
+    }
     #start_btn {
       width: 100px;
       height: 80px;
@@ -22,12 +30,26 @@
       background: blue;
       color: yellowgreen;
     }
+    #result {
+      margin: auto;
+      text-align: center;
+      background: beige;
+    }
+    #result_text {
+      color: red;
+    }
   </style>
   <body>
     <div id="header"><h1 id="title">가위바위보를 시작하지!</h1></div>
-    <button id="start_btn" type="button" onclick="init()">게임시작</button>
+    <button id="user_btn" type="button" onclick="init()">입장</button>
+    <button id="start_btn" type="button" onclick="game()">게임시작</button>
     <div id="webcam-container"></div>
     <div id="label-container"></div>
+    <div id="user_result"></div>
+    <div id="com_result"></div>
+    <div id="result"><h1 id="result_text"></h1></div>
+    <div id="count"><span id="count_text"></span></div>
+
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
     <script type="text/javascript">
@@ -53,7 +75,7 @@
 
         // Convenience function to setup a webcam
         const flip = true; // whether to flip the webcam
-        webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
+        webcam = new tmImage.Webcam(500, 500, flip); // width, height, flip
         await webcam.setup(); // request access to the webcam
         await webcam.play();
         window.requestAnimationFrame(loop);
@@ -74,6 +96,7 @@
       }
 
       // run the webcam image through the image model
+      let user;
       async function predict() {
         // predict can take in an image, video or canvas html element
         const prediction = await model.predict(webcam.canvas);
@@ -84,9 +107,51 @@
             prediction[i].probability.toFixed(2);
           labelContainer.childNodes[i].innerHTML = classPrediction;
         }
-        if (prediction[0].probability > 0.99) console.log("가위");
-        if (prediction[1].probability > 0.99) console.log("바위");
-        if (prediction[2].probability > 0.99) console.log("보");
+        if (prediction[0].probability > 0.95) {
+          user = prediction[0].className;
+        }
+        if (prediction[1].probability > 0.95) {
+          user = prediction[1].className;
+        }
+        if (prediction[2].probability > 0.95) {
+          user = prediction[2].className;
+        }
+        document.getElementById("user_result").innerHTML = `유저: ${user}`;
+      }
+
+      let com;
+      let ct = 5;
+
+      function game() {
+        setInterval(() => {
+          const choice = ["가위", "바위", "보"];
+          com = choice[Math.floor(Math.random() * 3)];
+          document.getElementById("com_result").innerHTML = `컴퓨터: ${[com]}`;
+          if (
+            (user === "가위" && com === "보") ||
+            (user === "바위" && com === "가위") ||
+            (user === "보" && com === "바위")
+          ) {
+            document.getElementById("result_text").innerHTML = "이겼습니다!";
+          } else if (
+            (user === "가위" && com === "바위") ||
+            (user === "바위" && com === "보") ||
+            (user === "보" && com === "가위")
+          ) {
+            document.getElementById("result_text").innerHTML =
+              "컴퓨터가 이겼습니다!";
+          } else {
+            document.getElementById("result_text").innerHTML = "비겼습니다!";
+          }
+
+          console.log(com);
+        }, 5 * 1000);
+      }
+      function count() {
+        ct = 5;
+        setInterval(() => {
+          document.getElementById("count_text").innerHTML = ct--;
+        }, 1 * 1000);
       }
     </script>
   </body>
