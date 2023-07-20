@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src=" https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+    <script src=" https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>
+  </head>
+  <body>
+    <h1>모델 예측</h1>
+    <label for="userInput">입력할 숫자: </label>
+    <input type="number" id="userInput" />
+    <button onclick="predictValue()">예측하기</button>
+
+    <p id="predictionResult">예측중.....</p>
+    <script>
+      const ran = [113, 346, 545, 232, 332, 123];
+      const rel = [385.98, 1248.08, 1984.38, 826.28, 1196.28, 422.98];
+
+      const tfran = tf.tensor1d(ran);
+      const tfrel = tf.tensor1d(rel);
+      /* 모델 로드 함수 */
+      async function loadModel() {
+        const model = await tf.loadLayersModel("localstorage://ex7_2data");
+        return model;
+      }
+      /* 모델을 만들기 함수적 API */
+      const x = tf.input({ shape: [1] });
+      // const y = tf.layers.dense({ units: 8, activation: "relu" }).apply(x); //은닉층
+      const z = tf.layers.dense({ units: 1 }).apply(x); //은닉층
+      const model = tf.model({ inputs: x, outputs: z });
+
+      const param = {
+        optimizer: tf.train.adam(),
+        loss: tf.losses.meanSquaredError,
+      };
+      model.compile(param); // 컴파일
+
+      /*훈련하기*/
+      const fitParam = {
+        epochs: 8000,
+        // batchsize: 64,
+        callbacks:
+          // [
+          //   tfvis.show.fitCallbacks(
+          //     { name: "show.fitCallbacks", tab: "Training" },
+
+          //     ["loss", "acc"]
+          //   ),
+          {
+            onEpochEnd: (epoch, logs) => {
+              console.log("epoch", epoch, logs, "RMSE=>", Math.sqrt(logs.loss));
+            },
+          },
+        // ],
+      };
+      (async () => {
+        await model.fit(tfran, tfrel, fitParam);
+        await model.predict(tfran).print();
+        await tfvis.show.modelSummary({ name: "요약", tab: "모델요약" }, model);
+        await tfvis.show.layer(
+          {
+            name: "요약",
+            tab: "가중치와 편향",
+          },
+          model.getLayer(undefined, 0)
+        );
+        await model.save("localstorage://ex7_2data");
+        await console.log("모델이 저장 되었습니다.");
+        await pre();
+      })();
+
+      /* 새로운 데이터 예측 */
+      let kernel, bias, total;
+      async function pre() {
+        const result = model.predict(tf.tensor1d([113]));
+        await result.array().then((v) => {
+          total = v[0][0];
+        });
+        /* y = wx + b 에서 w 값 구하기 */
+        const weights = model.getWeights();
+        console.log(weights);
+        await weights[0].array().then((v) => (kernel = v[0][0]));
+        await weights[0].array().then((v) => (bias = v[0]));
+        await console.log(
+          `y= ${kernel} x + ${bias}이고 x =113일때 예측한 값은 ${
+            kernel * 34 + bias
+          }즉, 예측 출력 된 ${total}이 된다.`
+        );
+      }
+
+      async function predictValue() {
+        const userInput = document.getElementById("userInput").valueAsNumber;
+        if (isNaN(userInput)) {
+          alert("유효한 숫자를 입력해주세요.");
+          return;
+        }
+
+        const model = await loadModel();
+        if (!model) {
+          alert("모델을 먼저 로드해주세요.");
+          return;
+        }
+
+        const result = model.predict(tf.tensor1d([userInput]));
+        const prediction = await result.array();
+        const predictedValue = prediction[0][0];
+
+        document.getElementById(
+          "predictionResult"
+        ).innerText = 입력한 숫자의 예측값: ${predictedValue};
+      }
+
+      // 모델 미리 로드
+      loadModel();
+    </script>
+  </body>
+</html>

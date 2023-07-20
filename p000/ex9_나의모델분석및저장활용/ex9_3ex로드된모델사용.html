@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>
+  </head>
+  <body>
+    <script>
+      /* 원시데이터 */
+      const temp = [113, 345, 545, 232, 332, 123]; // y = ax + b
+      const sell = [385.98, 1248.08, 1984.38, 826.28, 1196.28, 422.98]; // y = 5x+10
+      const tftemp = tf.tensor1d(temp);
+      const tfsell = tf.tensor1d(sell);
+
+      /* 모델 만들기. 함수적 API */
+      const x = tf.input({ shape: [1] });
+      //   const y = tf.layers.dense({ units: 8, activation: "relu" }).apply(x); // 은닉층
+      const z = tf.layers.dense({ units: 1 }).apply(x);
+      const model = tf.model({ inputs: x, outputs: z });
+      const param = {
+        optimizer: tf.train.adam(),
+        loss: tf.losses.meanSquaredError,
+      };
+
+      model.compile(param); // 컴파일
+
+      /* 훈련하기 */
+      const fitParam = {
+        epochs: 5000,
+        batchSize: 64,
+        callbacks: [
+          /* tfvis.show.fitCallbacks({ name: "데이터 그래프", tab: "훈련" }, [
+            "loss",
+            "acc",
+          ]), */
+          {
+            onEpochEnd: (epoch, logs) => {
+              console.log(
+                "epoch:",
+                epoch,
+                logs,
+                "RMSE=>",
+                Math.sqrt(logs.loss)
+              );
+            },
+          },
+        ],
+      };
+      (async () => {
+        await model.fit(tftemp, tfsell, fitParam);
+        await model.predict(tftemp).print();
+        await tfvis.show.modelSummary({ name: "요약", tab: "모델요약" }, model);
+        await tfvis.show.layer(
+          { name: "요약", tab: "가중치와 편향" },
+          model.getLayer(undefined, 0)
+        );
+        await model.save("localstorage://ex9_3_data");
+        await console.log("모델이 저장되었습니다.");
+        await pre();
+      })();
+
+      /* 새로운 데이터 예측 */
+      let total;
+      function pre() {
+        const newData = document.getElementById("new_data");
+        const resultText = document.querySelector("span");
+        const saveResult = document.getElementById("save_result");
+        newData.addEventListener("change", (e) => {
+          const inputData = e.currentTarget.value;
+          console.log(inputData);
+          const result = model.predict(tf.tensor1d([Number(inputData)]));
+          console.log(result.array());
+          result.array().then((v) => (total = v[0][0]));
+          resultText.innerHTML = total;
+        });
+      }
+    </script>
+    <div>
+      <h3>데이터를 입력하세요.</h3>
+      <input id="new_data" type="text" />
+    </div>
+    예측값 :<span></span>
+    <button id="save_result">예측하기</button>
+  </body>
+</html>
