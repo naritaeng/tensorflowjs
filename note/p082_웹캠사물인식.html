@@ -13,25 +13,32 @@ https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.m
   </head>
   <body>
     <div id="display"></div>
-    <button id="pick">스샷</button>
+    <button id="scan">스캔시작</button>
+    <button id="stop">정지</button>
     <div id="result"></div>
     <script>
       const video = document.createElement("video");
       const display = document.getElementById("display");
-      const pick = document.getElementById("pick");
+      const stop = document.getElementById("stop");
+      const scanStart = document.getElementById("scan");
       const res = document.getElementById("result");
       display.appendChild(video);
       video.width = 500;
       video.height = 500;
 
-      const main = async () => {
+      stop.addEventListener("click", () => {
+        clearInterval(stat);
+      });
+
+      const scan = async () => {
         const cam = await tf.data.webcam(video);
         const img = await cam.capture();
         const net = await mobilenet.load();
         const result = await net.classify(img);
 
         img.print();
-        tf.dispose(img);
+        tf.dispose(img); // 메모리 누수 막기
+        tf.dispose(net); // 메모리 누수 막기
         res.innerHTML =
           "결과" +
           result[0].className +
@@ -39,7 +46,12 @@ https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.m
           result[0].probability.toFixed(2);
       };
 
-      let stat = false;
+      scanStart.addEventListener("click", () => {
+        stat = setInterval(() => {
+          scan();
+        }, 1 * 1000);
+      });
+
       pick.addEventListener("click", () => {
         main();
       });
