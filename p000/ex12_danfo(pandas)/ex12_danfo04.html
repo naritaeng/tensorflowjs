@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/danfojs@1.1.2/lib/bundle.min.js"></script>
+  </head>
+  <body>
+    <script>
+      const json_data = [
+        { A: 0.4131, B: 4.1213, C: -1.4213, D: -1.7523 },
+        { A: 0.5131, B: -0.1213, C: -3.1213, D: 1.3523 },
+        { A: 0.6131, B: -0.3213, C: -1.7213, D: 2.7523 },
+        { A: 0.7131, B: -1.4213, C: 4.2213, D: 4.2523 },
+      ];
+      const df = new dfd.DataFrame(json_data);
+      df.print();
+    </script>
+  </body>
+</html>
