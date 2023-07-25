@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/danfojs@1.1.2/lib/bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>
+    <style>
+      div {
+        display: flex;
+        height: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <input type="file" name="" id="up" />
+    <div id="plot_div"></div>
+    <div id="plot_div2"></div>
+    <button id="predict">분석</button>
+    <script>
+      const tf = dfd.tensorflow;
+      const plot = document.getElementById("plot_div");
+      const input = document.getElementById("up");
+      const pre = document.getElementById("predict");
+      input.addEventListener("change", (ch) => {
+        // console.log(ch.target.files[0]);
+        dfd.readCSV(ch.target.files[0]).then((df) => {
+          df.print();
+          df.describe().print();
+          console.log(df.$dataIncolumnFormat);
+          const dfs = df.$dataIncolumnFormat;
+          const dfTrainAll = dfs.map((val, ind) => {
+            return val.filter((v, i) => {
+              return i % 5 !== 0;
+            });
+          });
+          const dfTestAll = dfs.map((val, ind) => {
+            return val.filter((v, i) => {
+              return i % 5 === 0;
+            });
+          });
+          const dfTrainTg = dfTrainAll.pop();
+          const dfTestTg = dfTestAll.pop();
+          const dfTrain = dfTrainAll;
+          const dfTest = dfTestAll;
+
+          // const dfTrainData = dfTrainAll.filter((val, ind) => {
+          //   return ind < 3;
+          // });
+          // const dfTrainTarget = dfTrainAll.filter((val, ind) => {
+          //   return ind === 3;
+          // });
+          // const dfTestData = dfTestAll.filter((val, ind) => {
+          //   return ind < 3;
+          // });
+          // const dfTestTarget = dfTestAll.filter((val, ind) => {
+          //   return ind === 3;
+          // });
+
+          console.log(dfTrain, dfTrainTg, dfTest, dfTestTg);
+          // console.log(dfTrainData, dfTrainTarget);
+          // console.log(dfTestData, dfTestTarget);
+
+          const dfTrainVis = dfTrain[0].map((v, i) => {
+            return { x: v, y: dfTrainTg[i] };
+          });
+          const dfTestVis = dfTest[0].map((v, i) => {
+            return { x: v, y: dfTestTg[i] };
+          });
+          console.log(dfTrainVis);
+          console.log(dfTestVis);
+          const dfTrainTgVis = dfTrainTg.map((v, i) => {
+            return { x: v, y: dfTrainTg[i] };
+          });
+          const dfTestTgVis = dfTestTg.map((v, i) => {
+            return { x: v, y: dfTestTg[i] };
+          });
+          console.log(dfTrainTgVis);
+          console.log(dfTestTgVis);
+
+          const model = tf.sequential();
+          model.add(tf.layers.dense({ inputShape: [1], units: 1 }));
+          model.compile({
+            loss: "meanSquaredError",
+            optimizer: "adam",
+            lr: 0.1,
+          });
+          const fitParam = {
+            epochs: 1000,
+            callbacks: {
+              onEpochEnd: (e, l) => {
+                console.log("epoch:", e, l, "RMSE=>", Math.sqrt(l.loss));
+              },
+            },
+          };
+
+          // const series = ["TV", "Radio", "Newspaper", "Sales"];
+          // const data = { values: [dfa[0], dfa[1], dfa[2]], series };
+          // const surface = { name: "Scatterplot", tab: "Charts" };
+          // tfvis.render.scatterplot(plot, data);
+
+          pre.addEventListener("click", async () => {
+            // console.log(df.shape);
+            await model.fit(
+              tf.tensor(dfTrain[0]),
+              tf.tensor(dfTrainTg),
+              fitParam
+            );
+            await model.predict(tf.tensor(dfTest[0])).print();
+
+            const series = ["TV", "Sales"];
+            const data = { values: [dfTrainVis, dfTestVis], series };
+
+            const surface = { name: "Scatterplot", tab: "Charts" };
+            tfvis.render.scatterplot(plot, data);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
+
+<!-- /* origin =>
+      data => TV,Radio,Newspaper
+      target => Salesrr
+      
+      TrainData => (TV,Radio,Newspaper) * 80%
+      TestData => (TV,Radio,Newspaper) * 20%
+      TrainTg => sales * 80%
+      TestTg => sales * 20% */ -->

@@ -2,6 +2,7 @@ const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 const result_label = document.getElementById("result_label");
+const stateText = document.getElementById("state_text");
 
 navigator.mediaDevices
   .getUserMedia({ video: true, audio: false })
@@ -20,8 +21,26 @@ posenet.load().then((model) => {
     model.estimateSinglePose(video).then((pose) => {
       canvas.width = video.width;
       canvas.height = video.height;
+      context.clearRect(0, 0, canvas.width, canvas.height); //
       drawKeypoints(pose.keypoints, 0.6, context);
       drawSkeleton(pose.keypoints, 0.6, context);
+      const spot = pose.keypoints;
+      // console.log(spot);
+      // console.log("eye:" + JSON.stringify(spot[2].position));
+      // console.log("wrist:" + JSON.stringify(spot[10].position));
+
+      if (spot[2].position.y > spot[10].position.y) {
+        stateText.innerHTML = "";
+        console.log("Rwrist:" + JSON.stringify(spot[10].position));
+        console.log("Reye:" + JSON.stringify(spot[2].position));
+        stateText.innerHTML = "오른손을 들었습니다.";
+      }
+      if (spot[1].position.y > spot[9].position.y) {
+        stateText.innerHTML = "";
+        console.log("Lwrist:" + JSON.stringify(spot[9].position));
+        console.log("Leye:" + JSON.stringify(spot[1].position));
+        stateText.innerHTML = "왼손을 들었습니다.";
+      }
     });
     requestAnimationFrame(predict);
   }
