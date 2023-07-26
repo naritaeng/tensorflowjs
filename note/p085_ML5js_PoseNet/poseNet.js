@@ -25,22 +25,32 @@ posenet.load().then((model) => {
       drawKeypoints(pose.keypoints, 0.6, context);
       drawSkeleton(pose.keypoints, 0.6, context);
       const spot = pose.keypoints;
-      // console.log(spot);
-      // console.log("eye:" + JSON.stringify(spot[2].position));
-      // console.log("wrist:" + JSON.stringify(spot[10].position));
+      const LeftWrist = spot[9].position.y;
+      const RightWrist = spot[10].position.y;
+      const LeftHand = spot[9].position.x;
+      const RightHand = spot[10].position.x;
+      setInterval(() => {
+        console.log("LeftWrist:" + JSON.stringify(LeftWrist));
+        console.log("RightWrist:" + JSON.stringify(RightWrist));
+        console.log("LeftHand:" + JSON.stringify(LeftHand));
+        console.log("RightHand:" + JSON.stringify(RightHand));
+      }, 3 * 1000);
 
-      if (spot[2].position.y > spot[10].position.y) {
-        stateText.innerHTML = "";
-        console.log("Rwrist:" + JSON.stringify(spot[10].position));
-        console.log("Reye:" + JSON.stringify(spot[2].position));
-        stateText.innerHTML = "오른손을 들었습니다.";
-      }
-      if (spot[1].position.y > spot[9].position.y) {
-        stateText.innerHTML = "";
-        console.log("Lwrist:" + JSON.stringify(spot[9].position));
-        console.log("Leye:" + JSON.stringify(spot[1].position));
-        stateText.innerHTML = "왼손을 들었습니다.";
-      }
+      // console.log(spot);
+
+      // if (spot[2].position.y > RightWrist) {
+      //   stateText.innerHTML = "";
+      //   console.log("Rwrist:" + JSON.stringify(RightWrist));
+      //   console.log("Reye:" + JSON.stringify(spot[2].position));
+      //   stateText.innerHTML = "오른손을 들었습니다.";
+      // }
+      // if (spot[1].position.y > LeftWrist) {
+      //   stateText.innerHTML = "";
+      //   console.log("Lwrist:" + JSON.stringify(spot[9].position));
+      //   console.log("Leye:" + JSON.stringify(spot[1].position));
+      //   stateText.innerHTML = "왼손을 들었습니다.";
+      // }
+      // if(LeftHand - RightHand  )
     });
     requestAnimationFrame(predict);
   }
