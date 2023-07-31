@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Camera with MobileNet</title>
+  </head>
+  <body>
+    <div>
+      <h1>Camera with MobileNet</h1>
+      <video id="video" width="320" height="240" autoplay></video>
+      <p id="result"></p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.8.4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.0.4/dist/mobilenet.min.js"></script>
+    <script>
+      // Load the model
+      async function loadModel() {
+        const model = await mobilenet.load()
+        console.log('Model loaded')
+        return model
+      }
+
+      // Initialize MediaDevices and start the video
+      async function initVideo() {
+        const video = document.getElementById('video')
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: true
+            })
+            video.srcObject = stream
+            console.log('Video stream started')
+          } catch (error) {
+            console.error('Error starting video stream:', error)
+          }
+        }
+      }
+
+      // Classify the current video frame
+      async function classifyFrame() {
+        const video = document.getElementById('video')
+        const resultElement = document.getElementById('result')
+
+        const model = await loadModel()
+        const predictions = await model.classify(video)
+
+        resultElement.innerText = 'Prediction: ' + predictions[0].className
+
+        // Continue classifying frames recursively
+        requestAnimationFrame(classifyFrame)
+      }
+
+      // Start the camera and classification
+      async function startCamera() {
+        await initVideo()
+        classifyFrame()
+      }
+
+      // Call the startCamera function when the page loads
+      window.addEventListener('load', startCamera)
+    </script>
+  </body>
+</html>
+``` This code includes the necessary HTML elements, the required JavaScript
+imports for TensorFlow.js and MobileNet, as well as the script to load the
+MobileNet model, start the video stream, classify the video frames, and display
+the result below the video.

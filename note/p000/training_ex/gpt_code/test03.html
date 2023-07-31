@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Layout with Buttons</title>
+    <style>
+        /* CSS styles for the layout */
+        /* Define the layout structure */
+        .header {
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+
+        .nav {
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+
+        .content {
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+
+        .sidebar {
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+
+        .footer {
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+
+        /* Define the button styles */
+        button {
+            background-color: yellow;
+            /* Updated color */
+            color: red;
+            /* Updated color */
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- Header section -->
+    <div class="header">
+        <h1>성준이 웹사이트</h1> <!-- Updated header content -->
+    </div>
+
+    <!-- Navigation section -->
+    <div class="nav">
+        <!-- Navigation content goes here -->
+    </div>
+
+    <!-- Content section -->
+    <div class="content">
+        <!-- Content buttons -->
+        <button class="button1" onclick="turnOnWebcam()">Button 1</button>
+        <button class="button2" onclick="analyzeWebcam()">Button 2</button>
+        <button class="button3" onclick="showNotification()">Button 3</button>
+        <video id="videoElement" autoplay></video>
+    </div>
+
+    <!-- Sidebar section -->
+    <div class="sidebar">
+        <!-- Sidebar content goes here -->
+    </div>
+
+    <!-- Footer section -->
+    <div class="footer">
+        <!-- Footer content goes here -->
+    </div>
+
+    <script>
+        // JavaScript code for button functionality
+        function turnOnWebcam() {
+            // Check if the browser supports the getUserMedia API
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                // Access the webcam using getUserMedia API
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function (stream) {
+                        // Set the video source to the webcam stream
+                        document.getElementById('videoElement').srcObject = stream;
+                    })
+                    .catch(function (error) {
+                        // Display an error message if webcam access is denied or not available
+                        console.error('Error accessing webcam:', error);
+                    });
+            } else {
+                // Display an error message if the browser does not support getUserMedia API
+                console.error('getUserMedia API not supported by this browser');
+            }
+
+        }
+
+        function analyzeWebcam() {
+            // Code to analyze webcam content using posenet goes here
+        }
+
+        function showNotification() {
+            alert("님 쫌 짱인듯");
+        }
+    </script>
+</body>
+
+</html>
