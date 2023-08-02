@@ -1,6 +1,6 @@
 require('dotenv').config()
 const TelegramBot = require('node-telegram-bot-api')
-const token = process.env.bottk2
+const token = process.env.bottk3
 const bot = new TelegramBot(token, { polling: true })
 const mongoose = require('mongoose')
 
@@ -9,6 +9,39 @@ const PWD = process.env.dbpw
 const HOST = process.env.dbhost
 const DB = process.env.db
 const mongodbURL = `mongodb://${USER}:${PWD}@${HOST}/${DB}`
+
+const { Configuration, OpenAIApi } = require('openai')
+const configuration = new Configuration({
+  apiKey: process.env.gptkey
+})
+const openai = new OpenAIApi(configuration)
+
+async function gpt3(input) {
+  const pmt = `Human: ${input} \nAI:`
+  const response = await openai.createChatCompletion({
+    model: 'gpt-3.5-turbo',
+    messages: [
+      {
+        role: 'system',
+        content: '10대 여성 말투'
+      },
+      {
+        role: 'system',
+        content: '요즘 유행하는 밈'
+      },
+      {
+        role: 'system',
+        content: '요즘 10대들이 자주 쓰는 말'
+      },
+      {
+        role: 'user',
+        content: `${pmt}`
+      }
+    ]
+  })
+  const answer = response.data.choices[0].message.content
+  return answer
+}
 
 mongoose.set('strictQuery', false) // 권장사항 추가
 
@@ -47,6 +80,7 @@ bot.onText(/^명령어/, (msg) => {
 /* Create */
 bot.on('message', async (msg) => {
   console.log(msg)
+  const chatId = msg.chat.id
   try {
     if (msg.text.startsWith('!')) return
     const KST = new Date(new Date().getTime() + 9 * 60 * 60 * 1000)
@@ -57,6 +91,8 @@ bot.on('message', async (msg) => {
       date: KST,
       text: msg.text
     })
+    const answer = await gpt3(msg.text)
+    bot.sendMessage(chatId, answer)
     await chatData.save()
     console.log('save success!')
   } catch (e) {

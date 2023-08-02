@@ -139,7 +139,6 @@ https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js
     /* 1.지도학습 텐서준비 */
     pre.addEventListener("click", () => {
       p.innerHTML = "데이터 로딩중...";
-      // const fatherHeight = parseFloat(newData.value); // 원하는 아빠 키로 설정
 
       const x = trainData; // traindata = 아빠키
       const y = trainTgData; // targetdata = 아들키
@@ -162,7 +161,7 @@ https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js
 
       /* 3. 모델로 훈련시작 */
       const fparam = {
-        epochs: 10,
+        epochs: 1000,
         //   batchSize: 32,
         callbacks: {
           onEpochEnd: (epoch, logs) => {
@@ -179,12 +178,6 @@ https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js
 
       model
         .fit(xt, yt, fparam)
-        // .then(() => {
-        //   const preHeight = model
-        //     .predict(tf.tensor([[fatherHeight]]))
-        //     .dataSync()[0];
-        //   p.innerHTML = `아들의 예상 키는 ${preHeight.toFixed(1)}cm입니다.`;
-        // })
         .then(() => {
           const savePath = "localstorage://my-model";
           model.save(savePath);
@@ -216,6 +209,7 @@ https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js
         "pre_rst"
       ).innerText = `아들의 예상 키: ${preHeight.toFixed(1)}cm`;
     }
+
   </script>
 </body>
 
