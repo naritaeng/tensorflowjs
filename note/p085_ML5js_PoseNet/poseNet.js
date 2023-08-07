@@ -27,24 +27,23 @@ posenet.load().then((model) => {
       const spot = pose.keypoints
       const LeftWrist = spot[9].position.y
       const RightWrist = spot[10].position.y
-      const LeftEye = spot[2].position.y
-      const RightEye = spot[1].position.y
+      const LeftEye = spot[1].position.y
+      const RightEye = spot[2].position.y
 
       // console.log(spot);
 
       if (RightEye > RightWrist) {
         stateText.innerHTML = ''
         console.log('Rwrist:' + JSON.stringify(RightWrist))
-        console.log('Reye:' + JSON.stringify(spot[2].position))
+        console.log('Reye:' + JSON.stringify(RightEye))
         stateText.innerHTML = '오른손을 들었습니다.'
       }
       if (LeftEye > LeftWrist) {
         stateText.innerHTML = ''
-        console.log('Lwrist:' + JSON.stringify(spot[9].position))
-        console.log('Leye:' + JSON.stringify(spot[1].position))
+        console.log('Lwrist:' + JSON.stringify(LeftWrist))
+        console.log('Leye:' + JSON.stringify(LeftEye))
         stateText.innerHTML = '왼손을 들었습니다.'
       }
-      model.dispose()
     })
     requestAnimationFrame(predict)
   }
