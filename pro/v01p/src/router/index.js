@@ -31,6 +31,25 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "about" */ '../views/Params.vue'),
     props: true // ==> Params 형식 props 사용 가능
+  },
+  {
+    path: '/pe',
+    name: 'Pe',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "about" */ '../views/PropsEmit.vue'),
+    props: true // ==> Params 형식 props 사용 가능
+  },
+  {
+    path: '/about',
+    name: 'about',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
   }
 ]
 

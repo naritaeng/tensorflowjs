@@ -1,6 +1,8 @@
 <template>
   <nav>
-    <router-link to="/">Home 페이지로</router-link>
+    <router-link to="/">Home 페이지로</router-link><br />
+    <router-link to="/about">about</router-link><br />
+    <router-link to="/pe">Props Emit 연습</router-link>
   </nav>
   <hr />
   <nav>
